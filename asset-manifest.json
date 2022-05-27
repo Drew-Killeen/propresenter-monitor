@@ -1,0 +1,12 @@
+{
+  "files": {
+    "main.css": "/propresenter-monitor/static/css/main.31d6cfe0.css",
+    "main.js": "/propresenter-monitor/static/js/main.278aa354.js",
+    "index.html": "/propresenter-monitor/index.html",
+    "main.278aa354.js.map": "/propresenter-monitor/static/js/main.278aa354.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.31d6cfe0.css",
+    "static/js/main.278aa354.js"
+  ]
+}
