@@ -3,8 +3,8 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 const axios = require("axios");
 
-let ip = "";
-let port = "";
+let ip = "localhost";
+let port = "1025";
 
 const fetchData = () => {
   return axios
@@ -16,8 +16,8 @@ class ConfigFields extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      ip: "localhost",
-      port: "1025",
+      ip: ip,
+      port: port,
     };
 
     this.handleChange = this.handleChange.bind(this);
