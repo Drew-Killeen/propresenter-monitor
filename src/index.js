@@ -22,6 +22,22 @@ class Config extends Component {
   }
 }
 
+class Countdown extends Component {
+  render() {
+    return <div>Countdown</div>;
+  }
+}
+class Elapsed extends Component {
+  render() {
+    return <div>Elapsed</div>;
+  }
+}
+class CountDownToTime extends Component {
+  render() {
+    return <div>CountDownToTime</div>;
+  }
+}
+
 class TimerContainer extends Component {
   state = {
     timers: [],
