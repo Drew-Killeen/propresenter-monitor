@@ -8,9 +8,31 @@ let port = "1025";
 
 const fetchData = () => {
   return axios
-    .get("http://" + ip + ":" + port + "/v1" + "/timers?chunked=false")
+    .get("http://" + ip + ":" + port + "/v1" + "/timers/current")
     .then((response) => response.data);
 };
+
+class PageContainer extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      configured: false,
+    };
+  }
+
+  setTimerState = () => {
+    this.setState({ configured: true });
+  };
+
+  render() {
+    return (
+      <>
+        <ConfigFields onConfigSuccess={this.setTimerState} />
+        {this.state.configured ? <TimerContainer /> : ""}
+      </>
+    );
+  }
+}
 
 class ConfigFields extends React.Component {
   constructor(props) {
@@ -38,6 +60,7 @@ class ConfigFields extends React.Component {
     event.preventDefault();
     ip = this.state.ip;
     port = this.state.port;
+    this.props.onConfigSuccess();
   }
 
   render() {
@@ -69,17 +92,11 @@ class ConfigFields extends React.Component {
 
 class Countdown extends React.Component {
   render() {
-    return <div>Countdown</div>;
-  }
-}
-class Elapsed extends React.Component {
-  render() {
-    return <div>Elapsed</div>;
-  }
-}
-class CountDownToTime extends React.Component {
-  render() {
-    return <div>CountDownToTime</div>;
+    return (
+      <div>
+        {this.props.name} - {this.props.time}
+      </div>
+    );
   }
 }
 
@@ -88,22 +105,31 @@ class TimerContainer extends React.Component {
     timers: [],
   };
 
+  componentDidMount() {
+    this.timerID = setInterval(() => this.tick(), 1000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timerID);
+  }
+
+  tick() {
+    fetchData().then((response) => {
+      this.setState({
+        timers: response,
+      });
+    });
+  }
+
   render() {
     return (
       <ul>
         {this.state.timers.map((timer) => {
-          // let timerType;
-          // if (timer.countdown) {
-          //   console.log("countdown");
-          //   timerType = timer.countdown.duration;
-          // } else if (timer.count_down_to_time) {
-          //   console.log("countdown to time");
-          //   timerType = timer.count_down_to_time.time_of_day;
-          // } else {
-          //   console.log("elapsed");
-          //   timerType = timer.elapsed.start_time;
-          // }
-          <li key={timer.id.index}>{timer.id.name}</li>;
+          return (
+            <li key={timer.id.index}>
+              <Countdown name={timer.id.name} time={timer.time} />
+            </li>
+          );
         })}
       </ul>
     );
@@ -111,4 +137,4 @@ class TimerContainer extends React.Component {
 }
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<ConfigFields />);
+root.render(<PageContainer />);
