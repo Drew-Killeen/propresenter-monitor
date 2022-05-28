@@ -4,8 +4,8 @@ import "./index.css";
 const axios = require("axios");
 
 let thumbnailQuality = 150;
-let ip = "localhost";
-let port = "1025";
+let ip = "";
+let port = "";
 
 const fetchTimerData = () => {
   return axios
@@ -62,6 +62,7 @@ class PageContainer extends React.Component {
     super(props);
     this.state = {
       configured: false,
+      error: false,
     };
   }
 
@@ -69,12 +70,13 @@ class PageContainer extends React.Component {
     fetchTimerData()
       .then((response) => {
         if (response.status == 200) {
-          this.setState({ configured: true });
+          this.setState({ configured: true, error: false });
         } else {
           console.log("Error: " + response.status);
         }
       })
       .catch((response) => {
+        this.setState({ error: true });
         console.log(response);
       });
   };
@@ -83,24 +85,28 @@ class PageContainer extends React.Component {
     return (
       <>
         <div className="page-title">ProPresenter Monitor</div>
+
         {this.state.configured ? (
           <>
             <TimerContainer />
             <SlidesContainer />
           </>
         ) : (
-          <ConfigFields onConfigSuccess={this.setTimerState} />
+          <ConfigFields
+            onConfigSuccess={this.setTimerState}
+            error={this.state.error}
+          />
         )}
       </>
     );
   }
 }
 
-class StatusOfConnection extends React.Component {
-  render() {
-    return <div className={this.props.status}>{this.props.status}</div>;
-  }
-}
+// class StatusOfConnection extends React.Component {
+//   render() {
+//     return <div className="error">Error: Cannot connect</div>;
+//   }
+// }
 
 class ConfigFields extends React.Component {
   constructor(props) {
@@ -108,6 +114,7 @@ class ConfigFields extends React.Component {
     this.state = {
       ip: ip,
       port: port,
+      connectText: "Connect",
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -126,6 +133,7 @@ class ConfigFields extends React.Component {
 
   handleSubmit(event) {
     event.preventDefault();
+    this.setState({ connectText: "Connecting..." });
     ip = this.state.ip;
     port = this.state.port;
     this.props.onConfigSuccess();
@@ -158,9 +166,18 @@ class ConfigFields extends React.Component {
           </div>
 
           <div>
-            <input className="submit-connect" type="submit" value="Connect" />
+            <input
+              className="submit-connect"
+              type="submit"
+              value={this.state.connectText}
+            />
           </div>
         </form>
+        {this.props.error ? (
+          <div className="error">Error: cannot connect</div>
+        ) : (
+          ""
+        )}
       </div>
     );
   }
