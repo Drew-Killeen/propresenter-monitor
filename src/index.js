@@ -7,6 +7,14 @@ let thumbnailQuality = 200;
 let ip = "";
 let port = "";
 
+const fetchVersion = () => {
+  return axios
+    .get("http://" + ip + ":" + port + "/version")
+    .then((response) => {
+      return response;
+    });
+};
+
 const fetchTimerData = () => {
   return axios
     .get("http://" + ip + ":" + port + "/v1/timers/current")
@@ -37,8 +45,8 @@ const fetchSlideCount = (id, index) => {
         "?quality=" +
         thumbnailQuality
     )
-    .then((response) => {
-      return response;
+    .then(() => {
+      return;
     });
 };
 
@@ -66,8 +74,9 @@ class PageContainer extends React.Component {
     };
   }
 
-  setTimerState = () => {
-    fetchTimerData()
+  // Check version. Will return 200 in case of success.
+  checkConnection = () => {
+    fetchVersion()
       .then((response) => {
         if (response.status == 200) {
           this.setState({ configured: true, error: false });
@@ -93,7 +102,7 @@ class PageContainer extends React.Component {
           </>
         ) : (
           <ConfigFields
-            onConfigSuccess={this.setTimerState}
+            onConfigSuccess={this.checkConnection}
             error={this.state.error}
           />
         )}
@@ -101,12 +110,6 @@ class PageContainer extends React.Component {
     );
   }
 }
-
-// class StatusOfConnection extends React.Component {
-//   render() {
-//     return <div className="error">Error: Cannot connect</div>;
-//   }
-// }
 
 class ConfigFields extends React.Component {
   constructor(props) {
@@ -187,7 +190,7 @@ class Timer extends React.Component {
   render() {
     return (
       <div>
-        {this.props.name} - {this.props.time}
+        {this.props.name}: {this.props.time}
       </div>
     );
   }
@@ -216,15 +219,15 @@ class TimerContainer extends React.Component {
 
   render() {
     return (
-      <ul>
+      <div className="module timers">
         {this.state.timers.map((timer) => {
           return (
-            <li key={timer.id.index}>
+            <div key={timer.id.index}>
               <Timer name={timer.id.name} time={timer.time} />
-            </li>
+            </div>
           );
         })}
-      </ul>
+      </div>
     );
   }
 }
