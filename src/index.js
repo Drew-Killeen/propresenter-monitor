@@ -9,7 +9,9 @@ let port = "1025";
 const fetchData = () => {
   return axios
     .get("http://" + ip + ":" + port + "/v1" + "/timers/current")
-    .then((response) => response.data);
+    .then((response) => {
+      return response;
+    });
 };
 
 class PageContainer extends React.Component {
@@ -21,16 +23,35 @@ class PageContainer extends React.Component {
   }
 
   setTimerState = () => {
-    this.setState({ configured: true });
+    fetchData()
+      .then((response) => {
+        if (response.status == 200) {
+          this.setState({ configured: true });
+        } else {
+          console.log("Error: " + response.status);
+        }
+      })
+      .catch((response) => {
+        console.log(response);
+      });
   };
 
   render() {
     return (
       <>
-        <ConfigFields onConfigSuccess={this.setTimerState} />
-        {this.state.configured ? <TimerContainer /> : ""}
+        {this.state.configured ? (
+          <TimerContainer />
+        ) : (
+          <ConfigFields onConfigSuccess={this.setTimerState} />
+        )}
       </>
     );
+  }
+}
+
+class StatusOfConnection extends React.Component {
+  render() {
+    return <div className={this.props.status}>{this.props.status}</div>;
   }
 }
 
@@ -116,7 +137,7 @@ class TimerContainer extends React.Component {
   tick() {
     fetchData().then((response) => {
       this.setState({
-        timers: response,
+        timers: response.data,
       });
     });
   }
