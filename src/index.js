@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 const axios = require("axios");
 
-let thumbnailQuality = 150;
+let thumbnailQuality = 200;
 let ip = "";
 let port = "";
 
@@ -231,7 +231,12 @@ class TimerContainer extends React.Component {
 
 class Slide extends React.Component {
   render() {
-    return <img src={this.props.img} />;
+    return (
+      <img
+        src={this.props.img}
+        className={this.props.currentSlide + "slide-thumbnail"}
+      />
+    );
   }
 }
 
@@ -285,7 +290,12 @@ class SlidesContainer extends React.Component {
       for (let i = 0; i < this.state.slideCount; i++) {
         slideImgs.push(
           <span key={i}>
-            <Slide img={fetchSlideThumbnail(this.state.presentationID, i)} />
+            <Slide
+              img={fetchSlideThumbnail(this.state.presentationID, i)}
+              currentSlide={
+                this.state.slideIndex === i ? "current-slide " : " "
+              }
+            />
           </span>
         );
       }
