@@ -3,12 +3,40 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 const axios = require("axios");
 
+let thumbnailQuality = 400;
 let ip = "localhost";
 let port = "1025";
 
-const fetchData = () => {
+const fetchTimerData = () => {
   return axios
-    .get("http://" + ip + ":" + port + "/v1" + "/timers/current")
+    .get("http://" + ip + ":" + port + "/v1/timers/current")
+    .then((response) => {
+      return response;
+    });
+};
+
+const fetchCurrentSlideIndex = () => {
+  return axios
+    .get("http://" + ip + ":" + port + "/v1/presentation/slide_index")
+    .then((response) => {
+      return response;
+    });
+};
+
+const fetchSlideThumbnail = (id, index) => {
+  return axios
+    .get(
+      "http://" +
+        ip +
+        ":" +
+        port +
+        "/v1/presentation/" +
+        id +
+        "/thumbnail/" +
+        index +
+        "?quality=" +
+        thumbnailQuality
+    )
     .then((response) => {
       return response;
     });
@@ -23,7 +51,7 @@ class PageContainer extends React.Component {
   }
 
   setTimerState = () => {
-    fetchData()
+    fetchTimerData()
       .then((response) => {
         if (response.status == 200) {
           this.setState({ configured: true });
@@ -40,7 +68,10 @@ class PageContainer extends React.Component {
     return (
       <>
         {this.state.configured ? (
-          <TimerContainer />
+          <>
+            <TimerContainer />
+            <SlidesContainer />
+          </>
         ) : (
           <ConfigFields onConfigSuccess={this.setTimerState} />
         )}
@@ -111,7 +142,7 @@ class ConfigFields extends React.Component {
   }
 }
 
-class Countdown extends React.Component {
+class Timer extends React.Component {
   render() {
     return (
       <div>
@@ -135,7 +166,7 @@ class TimerContainer extends React.Component {
   }
 
   tick() {
-    fetchData().then((response) => {
+    fetchTimerData().then((response) => {
       this.setState({
         timers: response.data,
       });
@@ -148,11 +179,81 @@ class TimerContainer extends React.Component {
         {this.state.timers.map((timer) => {
           return (
             <li key={timer.id.index}>
-              <Countdown name={timer.id.name} time={timer.time} />
+              <Timer name={timer.id.name} time={timer.time} />
             </li>
           );
         })}
       </ul>
+    );
+  }
+}
+
+class Slide extends React.Component {
+  render() {
+    return <div>Slide</div>;
+  }
+}
+
+class SlidesContainer extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      presentationID: "1",
+      presentationName: "",
+      slideIndex: 0,
+      slideCount: 0,
+      slidesData: [],
+      slidesStringArray: [],
+      slidesImgArray: [],
+    };
+
+    this.handlePresentationUpdate = this.handlePresentationUpdate.bind(this);
+  }
+
+  componentDidMount() {
+    this.handlePresentationUpdate();
+  }
+
+  handlePresentationUpdate() {
+    fetchCurrentSlideIndex().then((response) => {
+      console.log("handling presentation update");
+      this.setState({
+        presentationID: response.data.presentation_index.presentation_id.uuid,
+        presentationName: response.data.presentation_index.presentation_id.name,
+        slideIndex: response.data.presentation_index.index,
+      });
+
+      this.buildSlideArray(
+        response.data.presentation_index.presentation_id.uuid,
+        0
+      );
+    });
+  }
+
+  buildSlideArray(id, index) {
+    fetchSlideThumbnail(id, index)
+      .then((response) => {
+        this.buildSlideArray(id, index + 1);
+      })
+      .catch(() => {
+        this.setState({
+          slideCount: index,
+        });
+      });
+  }
+
+  render() {
+    return (
+      <>
+        <form onClick={this.handlePresentationUpdate}>
+          <input type="button" value="Refresh" />
+        </form>
+        <div>{this.state.presentationName}</div>
+        <div>
+          {this.state.slideIndex} / {this.state.slideCount}
+        </div>
+        <Slide />
+      </>
     );
   }
 }
