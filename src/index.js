@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 const axios = require("axios");
 
-let thumbnailQuality = 400;
+let thumbnailQuality = 150;
 let ip = "localhost";
 let port = "1025";
 
@@ -23,7 +23,7 @@ const fetchCurrentSlideIndex = () => {
     });
 };
 
-const fetchSlideThumbnail = (id, index) => {
+const fetchSlideCount = (id, index) => {
   return axios
     .get(
       "http://" +
@@ -40,6 +40,21 @@ const fetchSlideThumbnail = (id, index) => {
     .then((response) => {
       return response;
     });
+};
+
+const fetchSlideThumbnail = (id, index) => {
+  return (
+    "http://" +
+    ip +
+    ":" +
+    port +
+    "/v1/presentation/" +
+    id +
+    "/thumbnail/" +
+    index +
+    "?quality=" +
+    thumbnailQuality
+  );
 };
 
 class PageContainer extends React.Component {
@@ -190,7 +205,7 @@ class TimerContainer extends React.Component {
 
 class Slide extends React.Component {
   render() {
-    return <div>Slide</div>;
+    return <img src={this.props.img} />;
   }
 }
 
@@ -202,9 +217,6 @@ class SlidesContainer extends React.Component {
       presentationName: "",
       slideIndex: 0,
       slideCount: 0,
-      slidesData: [],
-      slidesStringArray: [],
-      slidesImgArray: [],
     };
 
     this.handlePresentationUpdate = this.handlePresentationUpdate.bind(this);
@@ -216,7 +228,6 @@ class SlidesContainer extends React.Component {
 
   handlePresentationUpdate() {
     fetchCurrentSlideIndex().then((response) => {
-      console.log("handling presentation update");
       this.setState({
         presentationID: response.data.presentation_index.presentation_id.uuid,
         presentationName: response.data.presentation_index.presentation_id.name,
@@ -231,8 +242,8 @@ class SlidesContainer extends React.Component {
   }
 
   buildSlideArray(id, index) {
-    fetchSlideThumbnail(id, index)
-      .then((response) => {
+    fetchSlideCount(id, index)
+      .then(() => {
         this.buildSlideArray(id, index + 1);
       })
       .catch(() => {
@@ -243,16 +254,30 @@ class SlidesContainer extends React.Component {
   }
 
   render() {
+    let slideImgs = [];
+    if (this.state.slideCount > 0) {
+      for (let i = 0; i < this.state.slideCount; i++) {
+        slideImgs.push(
+          <span key={i}>
+            <Slide img={fetchSlideThumbnail(this.state.presentationID, i)} />
+          </span>
+        );
+      }
+    }
+
     return (
       <>
         <form onClick={this.handlePresentationUpdate}>
           <input type="button" value="Refresh" />
         </form>
+
         <div>{this.state.presentationName}</div>
+
         <div>
           {this.state.slideIndex} / {this.state.slideCount}
         </div>
-        <Slide />
+
+        <div>{slideImgs}</div>
       </>
     );
   }
