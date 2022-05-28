@@ -82,6 +82,7 @@ class PageContainer extends React.Component {
   render() {
     return (
       <>
+        <div className="page-title">ProPresenter Monitor</div>
         {this.state.configured ? (
           <>
             <TimerContainer />
@@ -132,27 +133,35 @@ class ConfigFields extends React.Component {
 
   render() {
     return (
-      <form onSubmit={this.handleSubmit}>
-        <label>
-          IP Address:
-          <input
-            name="ip"
-            type="text"
-            value={this.state.ip}
-            onChange={this.handleChange}
-          />
-        </label>
-        <label>
-          Port:
-          <input
-            name="port"
-            type="text"
-            value={this.state.port}
-            onChange={this.handleChange}
-          />
-        </label>
-        <input type="submit" value="Submit" />
-      </form>
+      <div className="config-container">
+        <form onSubmit={this.handleSubmit}>
+          <div className="config-section">
+            <label className="config-label">IP Address:</label>
+            <input
+              className="text-input"
+              name="ip"
+              type="text"
+              value={this.state.ip}
+              onChange={this.handleChange}
+            />
+          </div>
+
+          <div className="config-section">
+            <label className="config-label">Port:</label>
+            <input
+              className="text-input"
+              name="port"
+              type="text"
+              value={this.state.port}
+              onChange={this.handleChange}
+            />
+          </div>
+
+          <div>
+            <input className="submit-connect" type="submit" value="Connect" />
+          </div>
+        </form>
+      </div>
     );
   }
 }
