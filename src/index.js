@@ -3,9 +3,9 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 const axios = require("axios");
 
-let thumbnailQuality = 200;
-let ip = "";
-let port = "";
+let thumbnailQuality = 150;
+let ip = "localhost";
+let port = "1025";
 
 const fetchVersion = () => {
   return axios
@@ -189,8 +189,11 @@ class ConfigFields extends React.Component {
 class Timer extends React.Component {
   render() {
     return (
-      <div>
-        {this.props.name}: {this.props.time}
+      <div className="timer-box">
+        <div className="timer-label">
+          {this.props.name}
+          <div className="timer-time">{this.props.time}</div>
+        </div>
       </div>
     );
   }
@@ -219,14 +222,17 @@ class TimerContainer extends React.Component {
 
   render() {
     return (
-      <div className="module timers">
-        {this.state.timers.map((timer) => {
-          return (
-            <div key={timer.id.index}>
-              <Timer name={timer.id.name} time={timer.time} />
-            </div>
-          );
-        })}
+      <div className="module timers-container">
+        <div className="container-title timers-title">Timers</div>
+        <ul>
+          {this.state.timers.map((timer) => {
+            return (
+              <li key={timer.id.index} className="timer">
+                <Timer name={timer.id.name} time={timer.time} />
+              </li>
+            );
+          })}
+        </ul>
       </div>
     );
   }
@@ -235,10 +241,13 @@ class TimerContainer extends React.Component {
 class Slide extends React.Component {
   render() {
     return (
-      <img
-        src={this.props.img}
-        className={this.props.currentSlide + "slide-thumbnail"}
-      />
+      <div
+        className={this.props.currentSlide + "slide-box"}
+        key={this.props.key}
+      >
+        <img src={this.props.img} className="slide-thumbnail" />
+        <div className="slide-number">{this.props.slideNumber}</div>
+      </div>
     );
   }
 }
@@ -292,14 +301,12 @@ class SlidesContainer extends React.Component {
     if (this.state.slideCount > 0) {
       for (let i = 0; i < this.state.slideCount; i++) {
         slideImgs.push(
-          <span key={i}>
-            <Slide
-              img={fetchSlideThumbnail(this.state.presentationID, i)}
-              currentSlide={
-                this.state.slideIndex === i ? "current-slide " : " "
-              }
-            />
-          </span>
+          <Slide
+            img={fetchSlideThumbnail(this.state.presentationID, i)}
+            slideNumber={i + 1}
+            key={i}
+            currentSlide={this.state.slideIndex === i ? "current-slide " : ""}
+          />
         );
       }
     }
@@ -310,13 +317,21 @@ class SlidesContainer extends React.Component {
           <input type="button" value="Refresh" />
         </form>
 
-        <div>{this.state.presentationName}</div>
+        <div className="module">
+          <div className="container-title">Presentation</div>
+          <div className="presentation-name presentation-box">
+            {this.state.presentationName}
+          </div>
 
-        <div>
-          {this.state.slideIndex} / {this.state.slideCount}
+          <div className="slide-count presentation-box">
+            {this.state.slideIndex} / {this.state.slideCount}
+          </div>
         </div>
 
-        <div>{slideImgs}</div>
+        <div className="module">
+          <div className="container-title">Slides</div>
+          <div className="container-slides">{slideImgs}</div>
+        </div>
       </>
     );
   }
