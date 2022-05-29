@@ -241,10 +241,7 @@ class TimerContainer extends React.Component {
 class Slide extends React.Component {
   render() {
     return (
-      <div
-        className={this.props.currentSlide + "slide-box"}
-        key={this.props.key}
-      >
+      <div className={this.props.currentSlide + "slide-box"}>
         <img src={this.props.img} className="slide-thumbnail" />
         <div className="slide-number">{this.props.slideNumber}</div>
       </div>
@@ -296,6 +293,20 @@ class SlidesContainer extends React.Component {
       });
   }
 
+  increaseSlideSize = () => {
+    if (thumbnailQuality < 500) {
+      thumbnailQuality = thumbnailQuality + 50;
+      this.buildSlideArray(this.state.presentationID, 0);
+    }
+  };
+
+  decreaseSlideSize = () => {
+    if (thumbnailQuality > 100) {
+      thumbnailQuality = thumbnailQuality - 50;
+      this.buildSlideArray(this.state.presentationID, 0);
+    }
+  };
+
   render() {
     let slideImgs = [];
     if (this.state.slideCount > 0) {
@@ -304,7 +315,6 @@ class SlidesContainer extends React.Component {
           <Slide
             img={fetchSlideThumbnail(this.state.presentationID, i)}
             slideNumber={i + 1}
-            key={i}
             currentSlide={this.state.slideIndex === i ? "current-slide " : ""}
           />
         );
@@ -313,23 +323,57 @@ class SlidesContainer extends React.Component {
 
     return (
       <>
-        <form onClick={this.handlePresentationUpdate}>
-          <input type="button" value="Refresh" />
-        </form>
-
         <div className="module">
-          <div className="container-title">Presentation</div>
+          <div className="container-title">
+            Presentation
+            <div className="refresh-container">
+              <form
+                className="refresh-form"
+                onClick={this.handlePresentationUpdate}
+              >
+                <input
+                  className="refresh-button"
+                  type="button"
+                  value="Refresh"
+                />
+              </form>
+            </div>
+          </div>
           <div className="presentation-name presentation-box">
             {this.state.presentationName}
           </div>
 
           <div className="slide-count presentation-box">
-            {this.state.slideIndex} / {this.state.slideCount}
+            {this.state.slideIndex + 1} / {this.state.slideCount}
           </div>
         </div>
 
         <div className="module">
-          <div className="container-title">Slides</div>
+          <div className="container-title">
+            Slides
+            <div className="slides-size-buttons-container">
+              <form
+                className="slides-size-form"
+                onClick={this.increaseSlideSize}
+              >
+                <input
+                  className="slides-size-buttons"
+                  type="button"
+                  value="+"
+                />
+              </form>
+              <form
+                className="slides-size-form"
+                onClick={this.decreaseSlideSize}
+              >
+                <input
+                  className="slides-size-buttons"
+                  type="button"
+                  value="-"
+                />
+              </form>
+            </div>
+          </div>
           <div className="container-slides">{slideImgs}</div>
         </div>
       </>

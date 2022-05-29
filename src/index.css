@@ -66,6 +66,7 @@ input[type="text"] {
 }
 
 .container-title {
+  display: flex;
   background-color: #1e1e1e;
   border-radius: 7px 7px 0 0;
   border-bottom: 1px solid #363636;
@@ -128,4 +129,24 @@ ul {
   padding: 5px 20px 5px 10px;
   cursor: pointer;
   border-bottom: 1px solid #363636;
+}
+
+.slides-size-buttons-container,
+.refresh-container {
+  margin-left: auto;
+}
+
+input.slides-size-buttons,
+input.refresh-button {
+  all: unset;
+  margin: 0 10px;
+  border: 1px solid #363636;
+  padding: 0 7px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+form.slides-size-form,
+form.refresh-form {
+  display: inline;
 }
