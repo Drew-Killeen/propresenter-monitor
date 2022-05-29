@@ -3,9 +3,10 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 const axios = require("axios");
 
-let thumbnailQuality = 150;
-let ip = "localhost";
-let port = "1025";
+// Sets the thumbnail size so that two thumbnails fit size by size, unless the size is greater than 300
+let thumbnailQuality = Math.min(Math.ceil(window.innerWidth / 2.5), 300);
+let ip = "";
+let port = "";
 
 const fetchVersion = () => {
   return axios
